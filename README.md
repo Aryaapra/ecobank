@@ -1,2 +1,0 @@
-# ecobank
-yaa
