@@ -10,11 +10,12 @@ class MonthlyRankingService
     {
         $periodStart = now()->startOfMonth();
         $periodEnd = $periodStart->copy()->addMonth();
-        $eligibleTransactions = static function () use ($periodStart, $periodEnd) {
+        $activeStatuses = ['pending', 'pickup_confirmed', 'weighing'];
+        $eligibleTransactions = static function () use ($periodStart, $periodEnd, $activeStatuses) {
             return DB::table('transactions')
                 ->join('users', 'users.id', '=', 'transactions.user_id')
                 ->where('users.role', 'user')
-                ->whereIn('transactions.status', ['approved', 'pending'])
+                ->whereIn('transactions.status', [...$activeStatuses, 'approved'])
                 ->where('transactions.created_at', '>=', $periodStart)
                 ->where('transactions.created_at', '<', $periodEnd);
         };
@@ -24,7 +25,7 @@ class MonthlyRankingService
                 'users.id',
                 'users.name',
                 DB::raw('SUM(transactions.weight_kg) AS weight_kg'),
-                DB::raw("SUM(CASE WHEN transactions.status = 'pending' THEN transactions.weight_kg ELSE 0 END) AS pending_weight_kg"),
+                DB::raw("SUM(CASE WHEN transactions.status <> 'approved' THEN transactions.weight_kg ELSE 0 END) AS pending_weight_kg"),
             )
             ->groupBy('users.id', 'users.name')
             ->orderByDesc('weight_kg')
@@ -79,7 +80,7 @@ class MonthlyRankingService
             ? 0.0
             : (float) $eligibleTransactions()
                 ->where('transactions.user_id', $userId)
-                ->where('transactions.status', 'pending')
+                ->whereIn('transactions.status', $activeStatuses)
                 ->sum('transactions.weight_kg');
         $currentUserRanking = $rankings->firstWhere('id', $userId);
 

@@ -35,12 +35,71 @@ class ReportController extends Controller
             'reportMonth' => $month,
             'monthSummary' => [
                 'transactionCount' => (clone $transactions)->count(),
-                'pendingCount' => (clone $transactions)->where('transactions.status', 'pending')->count(),
+                'pendingCount' => (clone $transactions)
+                    ->whereIn('transactions.status', ['pending', 'pickup_confirmed', 'weighing'])
+                    ->count(),
                 'approvedWeight' => (float) (clone $transactions)
                     ->where('transactions.status', 'approved')->sum('transactions.weight_kg'),
                 'approvedValue' => (int) (clone $transactions)
                     ->where('transactions.status', 'approved')->sum('transactions.total_value'),
             ],
+        ]);
+    }
+
+    public function history(Request $request): View
+    {
+        [$month, $periodStart, $periodEnd] = $this->period($request);
+        $transactions = $this->transactionsForPeriod($periodStart, $periodEnd)
+            ->select([
+                'transactions.id',
+                'transactions.transaction_code',
+                'transactions.request_group_code',
+                'transactions.customer_name',
+                'transactions.waste_type_id',
+                'waste_types.name AS waste_name',
+                'waste_types.category AS waste_category',
+                'waste_types.price AS current_unit_price',
+                'transactions.weight_kg',
+                'transactions.total_value',
+                'transactions.unit_price',
+                'transactions.status',
+                'transactions.process_stage',
+                'transactions.created_at',
+            ])
+            ->orderByDesc('transactions.created_at')
+            ->orderByDesc('transactions.id')
+            ->get()
+            ->groupBy(fn(object $transaction): string => $transaction->request_group_code
+                ?: $transaction->transaction_code)
+            ->map(function ($items, string $groupId): object {
+                $first = $items->first();
+                $wasteItems = $items->map(fn(object $item): array => [
+                    'id' => (int) $item->id,
+                    'name' => $item->waste_name ?? 'Jenis sampah dihapus',
+                    'category' => $item->waste_category ?? '—',
+                    'weight' => (float) $item->weight_kg,
+                    'value' => (int) $item->total_value,
+                    'unitPrice' => (int) ($item->unit_price ?? $item->current_unit_price ?? 0),
+                ])->values();
+
+                return (object) [
+                    'transaction_code' => $items->count() > 1
+                        ? $groupId
+                        : $first->transaction_code,
+                    'customer_name' => $first->customer_name,
+                    'status' => $first->status,
+                    'process_stage' => $first->process_stage,
+                    'created_at' => $first->created_at,
+                    'weight_kg' => (float) $items->sum('weight_kg'),
+                    'total_value' => (int) $items->sum('total_value'),
+                    'items' => $wasteItems,
+                ];
+            })
+            ->values();
+
+        return view('admin_riwayat', [
+            'reportMonth' => $month,
+            'transactions' => $transactions,
         ]);
     }
 

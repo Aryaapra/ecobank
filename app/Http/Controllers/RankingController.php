@@ -11,7 +11,18 @@ class RankingController extends Controller
 {
     public function __invoke(MonthlyRankingService $monthlyRanking): View
     {
-        return view('peringkat', $monthlyRanking->build());
+        return view('peringkat', [
+            ...$monthlyRanking->build(),
+            'isUserView' => false,
+        ]);
+    }
+
+    public function user(Request $request, MonthlyRankingService $monthlyRanking): View
+    {
+        return view('peringkat', [
+            ...$monthlyRanking->build($request->user()->id),
+            'isUserView' => true,
+        ]);
     }
 
     public function data(Request $request, MonthlyRankingService $monthlyRanking): JsonResponse

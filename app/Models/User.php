@@ -24,6 +24,9 @@ class User extends Authenticatable
         'district',
         'password_hash',
         'role',
+        'payout_bank',
+        'payout_account_number',
+        'payout_account_name',
     ];
 
     /**
@@ -34,6 +37,9 @@ class User extends Authenticatable
     protected $hidden = [
         'password_hash',
         'remember_token',
+        'payout_bank',
+        'payout_account_number',
+        'payout_account_name',
     ];
 
     /**
@@ -45,6 +51,8 @@ class User extends Authenticatable
     {
         return [
             'password_hash' => 'hashed',
+            'payout_account_number' => 'encrypted',
+            'payout_account_name' => 'encrypted',
         ];
     }
 

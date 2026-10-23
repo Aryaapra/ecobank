@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=navbar-full-width-1" />
 </head>
 
 <body class="app-page" data-page="prices">
@@ -23,8 +23,8 @@
         </button>
         <nav class="app-nav" aria-label="Navigasi utama">
             <a href="dashboard_bank_sampah.html">Beranda</a>
-            <a href="transaksi.html">Transaksi <span class="nav-count" data-pending-count>3</span></a>
-            <a href="pengguna.html">Anggota</a>
+            <a href="transaksi.html">Transaksi <span class="nav-count" data-pending-count>{{ $pendingTransactionCount }}</span></a>
+            <a href="riwayat_transaksi.html">Riwayat</a>
             <a href="peringkat.html">Peringkat</a>
             <a class="active" href="listing_limbah_sampah.html">Layanan</a>
         </nav>
@@ -35,10 +35,9 @@
             </button>
             <div class="profile-dropdown" id="profile-menu" hidden>
                 <strong>Admin EcoBank</strong>
-                <a href="dashboard_bank_sampah.html">Dashboard</a>
-                <a href="transaksi.html">Transaksi</a>
+                <a href="profil.html">Profil</a>
                 <a href="pengguna.html">Anggota</a>
-                <a href="peringkat.html">Peringkat</a>
+                <a href="penarikan_admin.html">Penarikan</a>
                 <button type="button" data-profile-logout data-logout-target="auth.html">
                     Keluar
                 </button>

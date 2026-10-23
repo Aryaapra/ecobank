@@ -13,10 +13,10 @@
     <link rel="preconnect" href="https://images.unsplash.com" />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=navbar-full-width-1" />
 </head>
 
-<body class="app-page user-home-page">
+<body class="app-page user-home-page" data-page="user-home">
     <header class="app-header">
         <a class="brand" href="beranda_user.html">EcoBank<span>.</span></a>
         <button class="menu-toggle" type="button" aria-label="Buka navigasi" aria-expanded="false">
@@ -24,8 +24,9 @@
         </button>
         <nav class="app-nav" aria-label="Navigasi utama">
             <a class="active" href="#beranda" aria-current="page">Beranda</a>
-            <a href="#setor">Setor Sampah</a>
-            <a href="#riwayat">Riwayat</a>
+            <a href="setor_sampah.html">Setor Sampah</a>
+            <a href="riwayat.html">Riwayat</a>
+            <a href="peringkat_user.html">Peringkat</a>
         </nav>
         <div class="profile-control" data-profile-control>
             <button class="profile-button user-profile" type="button" aria-label="Buka menu profil"
@@ -34,10 +35,8 @@
                 A
             </button>
             <div class="profile-dropdown" id="profile-menu" hidden>
-                <strong data-profile-name>Alza</strong>
-                <a href="beranda_user.html#beranda">Beranda</a>
-                <a href="beranda_user.html#setor">Setor sampah</a>
-                <a href="beranda_user.html#riwayat">Riwayat setoran</a>
+                <strong data-profile-name>Pengguna</strong>
+                <a href="profil.html">Profil</a>
                 <button type="button" data-profile-logout data-logout-target="auth.html">
                     Keluar
                 </button>
@@ -50,7 +49,7 @@
         <div class="user-welcome">
             <div>
                 <p class="eyebrow eyebrow-green">Beranda</p>
-                <h1>Halo, <span data-user-name>Alza</span></h1>
+                <h1>Halo, <span data-user-name>Pengguna</span></h1>
                 <p>Senang melihatmu kembali. Yuk, lanjutkan kebiasaan baikmu.</p>
             </div>
             <span class="user-location" data-user-district><span aria-hidden="true">⌖</span> Batam Centre</span>
@@ -62,14 +61,13 @@
             <div class="user-cover-content">
                 <p class="eyebrow">Satu setoran, banyak perubahan</p>
                 <h2>Sampah hari ini,<br />masa depan lebih bersih.</h2>
-                <a class="button button-light" href="#setor">
-                    Mulai dari rumah <span aria-hidden="true">→</span>
+                <a class="button button-light" href="setor_sampah.html">
+                    Setor Sekarang<span aria-hidden="true">→</span>
                 </a>
             </div>
-            <span class="cover-stamp" aria-hidden="true">♻</span>
         </section>
 
-        <section class="user-summary" id="setor" aria-label="Setoran dan saldo">
+        <section class="user-summary" aria-label="Setoran dan saldo">
             <article class="deposit-prompt">
                 <div class="deposit-image">
                     <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=500&q=85"
@@ -82,7 +80,7 @@
                         Pilah sampah dari rumah. Cek harga terbaru sebelum kamu
                         menyetorkannya.
                     </p>
-                    <a class="button button-primary button-small" href="#form-setor">
+                    <a class="button button-primary button-small" href="setor_sampah.html">
                         Lihat harga sampah <span aria-hidden="true">→</span>
                     </a>
                 </div>
@@ -93,7 +91,10 @@
                 </div>
                 <strong data-user-balance>Rp 0</strong>
                 <p>Saldo EcoPoint yang sudah kamu kumpulkan.</p>
-                <a href="#riwayat">Lihat riwayat <span aria-hidden="true">→</span></a>
+                <div class="balance-actions">
+                    <a href="riwayat.html">Lihat riwayat <span aria-hidden="true">→</span></a>
+                    <a href="penarikan_saldo.html">Tarik saldo <span aria-hidden="true">→</span></a>
+                </div>
             </article>
         </section>
 
@@ -106,11 +107,11 @@
                 <div class="mini-podium" data-ranking-podium role="img" aria-label="Memuat peringkat kontributor">
                     <span class="ranking-widget-empty">Memuat peringkat...</span>
                 </div>
-                <a class="rank-self" href="peringkat.html">
+                <a class="rank-self" href="peringkat_user.html">
                     <strong data-user-rank-state>Anda</strong><span data-user-rank-position>--</span>
                     <b data-user-rank-weight>-- kg</b>
                 </a>
-                <a class="mini-board-link" href="peringkat.html">
+                <a class="mini-board-link" href="peringkat_user.html">
                     Lihat papan peringkat <span aria-hidden="true">→</span>
                 </a>
             </article>
@@ -133,11 +134,11 @@
                 <ol data-user-waste-rankings>
                     <li class="ranking-widget-empty">Memuat data material...</li>
                 </ol>
-                <a href="peringkat.html">Lihat semua <span aria-hidden="true">→</span></a>
+                <a href="peringkat_user.html">Lihat semua <span aria-hidden="true">→</span></a>
             </article>
         </section>
 
-        <section class="user-prices" id="harga" aria-labelledby="prices-title">
+        <section class="user-prices" id="harga" aria-labelledby="prices-title" hidden>
             <div class="user-section-heading price-heading">
                 <div>
                     <p class="eyebrow eyebrow-green">Harga tukar sampah</p>
@@ -275,7 +276,7 @@
             <p class="inline-notice" data-user-price-status role="status" hidden></p>
         </section>
 
-        <section class="user-request" id="form-setor" aria-labelledby="deposit-title">
+        <section class="user-request" id="form-setor" aria-labelledby="deposit-title" hidden>
             <div class="user-section-heading">
                 <p class="eyebrow eyebrow-green">Setoran baru</p>
                 <h2 id="deposit-title">Ajukan setoran sampah</h2>
@@ -297,7 +298,7 @@
             <p class="inline-notice" data-deposit-status role="status" aria-live="polite"></p>
         </section>
 
-        <section class="user-history" id="riwayat" aria-labelledby="history-title">
+        <section class="user-history" id="riwayat" aria-labelledby="history-title" hidden>
             <div class="user-section-heading user-heading-row">
                 <div>
                     <p class="eyebrow eyebrow-green">Aktivitasmu</p>
@@ -341,12 +342,23 @@
         </article>
     </main>
 
+    <dialog class="confirm-dialog waste-types-dialog" data-user-waste-types-dialog
+        aria-labelledby="home-waste-types-title">
+        <span class="confirm-icon" aria-hidden="true">♻</span>
+        <h2 id="home-waste-types-title">Jenis sampah</h2>
+        <p data-user-waste-types-summary></p>
+        <ul data-user-waste-types-list></ul>
+        <div class="dialog-actions">
+            <button class="button button-secondary" type="button" data-user-waste-types-close>Tutup</button>
+        </div>
+    </dialog>
+
     <footer class="app-footer">
         <a class="brand" href="beranda_user.html">EcoBank<span>.</span></a>
         <span>Lebih bijak mengelola sampah, lebih baik untuk bumi.</span>
     </footer>
     <script src="app.js?v=prices-api-1"></script>
-    <script src="user-home.js"></script>
+    <script src="user-home.js?v=grouped-history-details-1"></script>
 </body>
 
 </html>

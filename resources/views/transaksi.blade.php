@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=navbar-full-width-1" />
 </head>
 
 <body class="app-page" data-page="transactions">
@@ -23,8 +23,9 @@
         </button>
         <nav class="app-nav" aria-label="Navigasi utama">
             <a href="dashboard_bank_sampah.html">Beranda</a>
-            <a class="active" href="transaksi.html">Transaksi <span class="nav-count" data-pending-count>3</span></a>
-            <a href="pengguna.html">Anggota</a>
+            <a class="active" href="transaksi.html" aria-current="page">Transaksi <span class="nav-count"
+                    data-pending-count>{{ $pendingTransactionCount }}</span></a>
+            <a href="riwayat_transaksi.html">Riwayat</a>
             <a href="peringkat.html">Peringkat</a>
             <a href="listing_limbah_sampah.html">Layanan</a>
         </nav>
@@ -35,10 +36,9 @@
             </button>
             <div class="profile-dropdown" id="profile-menu" hidden>
                 <strong>Admin EcoBank</strong>
-                <a href="dashboard_bank_sampah.html">Dashboard</a>
-                <a href="transaksi.html">Transaksi</a>
+                <a href="profil.html">Profil</a>
                 <a href="pengguna.html">Anggota</a>
-                <a href="peringkat.html">Peringkat</a>
+                <a href="penarikan_admin.html">Penarikan</a>
                 <button type="button" data-profile-logout data-logout-target="auth.html">
                     Keluar
                 </button>
@@ -70,25 +70,32 @@
             <article class="stat-card stat-feature">
                 <span class="stat-icon">↗</span>
                 <p>Total transaksi</p>
-                <strong>{{ number_format($monthSummary['transactionCount'], 0, ',', '.') }}</strong><small>Pada bulan
+                <strong
+                    data-report-transaction-count>{{ number_format($monthSummary['transactionCount'], 0, ',', '.') }}</strong><small>Pada
+                    bulan
                     terpilih</small>
             </article>
             <article class="stat-card">
                 <span class="stat-icon stat-icon-green">♻</span>
                 <p>Sampah terkumpul</p>
-                <strong>{{ number_format($monthSummary['approvedWeight'], 2, ',', '.') }} kg</strong><small>Setoran
+                <strong><span
+                        data-report-approved-weight>{{ number_format($monthSummary['approvedWeight'], 2, ',', '.') }}</span>
+                    kg</strong><small>Setoran
                     disetujui</small>
             </article>
             <article class="stat-card">
                 <span class="stat-icon stat-icon-yellow">◷</span>
                 <p>Menunggu verifikasi</p>
-                <strong>{{ number_format($monthSummary['pendingCount'], 0, ',', '.') }}</strong><small>Pada bulan
+                <strong
+                    data-report-pending-count>{{ number_format($monthSummary['pendingCount'], 0, ',', '.') }}</strong><small>Pada
+                    bulan
                     terpilih</small>
             </article>
             <article class="stat-card">
                 <span class="stat-icon stat-icon-blue">Rp</span>
                 <p>Nilai setoran disetujui</p>
-                <strong>Rp {{ number_format($monthSummary['approvedValue'], 0, ',', '.') }}</strong><small>Pada bulan
+                <strong data-report-approved-value>Rp
+                    {{ number_format($monthSummary['approvedValue'], 0, ',', '.') }}</strong><small>Pada bulan
                     terpilih</small>
             </article>
         </section>
@@ -106,10 +113,16 @@
                             type="search" placeholder="Cari nama atau ID..." aria-label="Cari transaksi"
                             data-transaction-search /></label>
                     <label class="filter-select"><span class="sr-only">Filter status</span><select data-status-filter>
-                            <option value="all">Semua status</option>
-                            <option value="pending">Menunggu</option>
-                            <option value="approved">Disetujui</option>
-                            <option value="cancelled">Dibatalkan</option>
+                            <option value="all">Semua setoran aktif</option>
+                            <option value="pending">Menunggu proses</option>
+                        </select></label>
+                    <label class="filter-select"><span class="sr-only">Filter tahap proses</span><select
+                            data-stage-filter>
+                            <option value="all">Semua tahap</option>
+                            <option value="requested">Permintaan baru</option>
+                            <option value="pickup_confirmed">Jemput dikonfirmasi</option>
+                            <option value="weighing">Menunggu penimbangan</option>
+                            <option value="completed">Selesai ditimbang</option>
                         </select></label>
                     <label class="filter-select"><span class="sr-only">Filter jenis sampah</span><select
                             data-type-filter>
@@ -121,12 +134,15 @@
                             <option>Logam</option>
                         </select></label>
                 </div>
+                <p class="inline-notice transaction-feedback" data-transaction-feedback role="status"
+                    aria-live="polite" hidden></p>
                 <div class="table-scroll">
                     <table class="transaction-table">
                         <thead>
                             <tr>
                                 <th>Pengguna</th>
                                 <th>Jenis sampah</th>
+                                <th>Metode</th>
                                 <th>Berat</th>
                                 <th>Nilai setoran</th>
                                 <th>Tanggal</th>
@@ -139,8 +155,8 @@
                 </div>
                 <div class="empty-state" data-transactions-empty hidden>
                     <span>♻</span>
-                    <h3>Belum ada transaksi</h3>
-                    <p>Coba ubah filter atau kata pencarian.</p>
+                    <h3>Tidak ada setoran yang menunggu</h3>
+                    <p>Setoran yang selesai atau dibatalkan bisa dilihat di Riwayat.</p>
                 </div>
                 <div class="table-footer">
                     <span data-transaction-count>Menampilkan transaksi</span><span class="pagination-label">EcoBank ·
@@ -184,10 +200,32 @@
             </button>
         </div>
     </dialog>
+    <dialog class="confirm-dialog weigh-dialog" data-weigh-dialog aria-labelledby="weigh-dialog-title">
+        <form data-weigh-form>
+            <span class="confirm-icon">⚖</span>
+            <h2 id="weigh-dialog-title">Konfirmasi hasil timbang</h2>
+            <p data-weigh-summary>Masukkan berat aktual untuk setiap jenis sampah.</p>
+            <div class="weigh-items" data-weigh-items></div>
+            <p class="weigh-feedback" data-weigh-feedback role="status" aria-live="polite"></p>
+            <div class="dialog-actions">
+                <button class="button button-secondary" type="button" data-weigh-cancel>Kembali</button>
+                <button class="button button-primary" type="submit">Simpan berat &amp; masukkan saldo</button>
+            </div>
+        </form>
+    </dialog>
+    <dialog class="confirm-dialog waste-types-dialog" data-waste-types-dialog aria-labelledby="waste-types-title">
+        <span class="confirm-icon">♻</span>
+        <h2 id="waste-types-title">Jenis sampah</h2>
+        <p data-waste-types-summary></p>
+        <ul data-waste-types-list></ul>
+        <div class="dialog-actions">
+            <button class="button button-secondary" type="button" data-waste-types-close>Tutup</button>
+        </div>
+    </dialog>
     <footer class="app-footer">
         <a class="brand" href="index.html">EcoBank<span>.</span></a><span>Mengubah sampah menjadi harapan.</span>
     </footer>
-    <script src="app.js?v=prices-api-1"></script>
+    <script src="app.js?v=pending-only-1"></script>
 </body>
 
 </html>

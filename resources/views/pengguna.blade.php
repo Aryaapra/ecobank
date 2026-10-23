@@ -10,7 +10,7 @@
     <title>Anggota — EcoBank</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=navbar-full-width-1" />
 </head>
 
 <body class="app-page" data-page="members">
@@ -19,8 +19,8 @@
         <button class="menu-toggle" type="button" aria-label="Buka navigasi" aria-expanded="false">☰</button>
         <nav class="app-nav" aria-label="Navigasi utama">
             <a href="dashboard_bank_sampah.html">Beranda</a>
-            <a href="transaksi.html">Transaksi <span class="nav-count" data-pending-count>0</span></a>
-            <a href="pengguna.html" class="active" aria-current="page">Anggota</a>
+            <a href="transaksi.html">Transaksi <span class="nav-count" data-pending-count>{{ $pendingTransactionCount }}</span></a>
+            <a href="riwayat_transaksi.html">Riwayat</a>
             <a href="peringkat.html">Peringkat</a>
             <a href="listing_limbah_sampah.html">Layanan</a>
         </nav>
@@ -29,9 +29,9 @@
                 aria-expanded="false" aria-controls="profile-menu" data-profile-toggle>A</button>
             <div class="profile-dropdown" id="profile-menu" hidden>
                 <strong>Admin EcoBank</strong>
-                <a href="dashboard_bank_sampah.html">Dashboard</a>
-                <a href="transaksi.html">Transaksi</a>
-                <a href="pengguna.html">Anggota</a>
+                <a href="profil.html">Profil</a>
+                <a href="pengguna.html" aria-current="page">Anggota</a>
+                <a href="penarikan_admin.html">Penarikan</a>
                 <button type="button" data-profile-logout data-logout-target="auth.html">Keluar</button>
                 <p data-profile-feedback role="status" hidden></p>
             </div>
@@ -45,7 +45,7 @@
                 <h1>Anggota bank sampah</h1>
                 <p>{{ number_format($members->total(), 0, ',', '.') }} anggota terdaftar</p>
             </div>
-            <a class="button button-secondary" href="{{ route('admin.transactions') }}">Lihat transaksi <span
+            <a class="button button-primary" href="{{ route('admin.history') }}">Lihat riwayat <span
                     aria-hidden="true">→</span></a>
         </div>
 

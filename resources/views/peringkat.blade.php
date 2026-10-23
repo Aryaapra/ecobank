@@ -12,33 +12,44 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=navbar-full-width-1" />
 </head>
 
-<body class="app-page" data-page="ranking">
+<body class="app-page" data-page="{{ $isUserView ? 'user-ranking' : 'ranking' }}">
     <header class="app-header">
-        <a class="brand" href="index.html">EcoBank<span>.</span></a>
+        <a class="brand" href="{{ $isUserView ? 'beranda_user.html' : 'dashboard_bank_sampah.html' }}">EcoBank<span>.</span></a>
         <button class="menu-toggle" type="button" aria-label="Buka navigasi" aria-expanded="false">
             ☰
         </button>
         <nav class="app-nav" aria-label="Navigasi utama">
-            <a href="dashboard_bank_sampah.html">Beranda</a>
-            <a href="transaksi.html">Transaksi <span class="nav-count" data-pending-count>3</span></a>
-            <a href="pengguna.html">Anggota</a>
-            <a class="active" href="peringkat.html" aria-current="page">Peringkat</a>
-            <a href="listing_limbah_sampah.html">Layanan</a>
+            @if ($isUserView)
+                <a href="beranda_user.html">Beranda</a>
+                <a href="setor_sampah.html">Setor Sampah</a>
+                <a href="riwayat.html">Riwayat</a>
+                <a class="active" href="peringkat_user.html" aria-current="page">Peringkat</a>
+            @else
+                <a href="dashboard_bank_sampah.html">Beranda</a>
+                <a href="transaksi.html">Transaksi <span class="nav-count" data-pending-count>{{ $pendingTransactionCount }}</span></a>
+                <a href="riwayat_transaksi.html">Riwayat</a>
+                <a class="active" href="peringkat.html" aria-current="page">Peringkat</a>
+                <a href="listing_limbah_sampah.html">Layanan</a>
+            @endif
         </nav>
         <div class="profile-control" data-profile-control>
-            <button class="profile-button" type="button" aria-label="Buka menu profil admin" aria-haspopup="true"
-                aria-expanded="false" aria-controls="profile-menu" data-profile-toggle>
+            <button class="profile-button {{ $isUserView ? 'user-profile' : '' }}" type="button"
+                aria-label="Buka menu profil" aria-haspopup="true" aria-expanded="false"
+                aria-controls="profile-menu" data-profile-toggle>
                 A
             </button>
             <div class="profile-dropdown" id="profile-menu" hidden>
-                <strong>Admin EcoBank</strong>
-                <a href="dashboard_bank_sampah.html">Dashboard</a>
-                <a href="transaksi.html">Transaksi</a>
-                <a href="pengguna.html">Anggota</a>
-                <a href="peringkat.html">Peringkat</a>
+                <strong>{{ $isUserView ? 'Memuat akun...' : 'Admin EcoBank' }}</strong>
+                @if ($isUserView)
+                    <a href="profil.html">Profil</a>
+                @else
+                    <a href="profil.html">Profil</a>
+                    <a href="pengguna.html">Anggota</a>
+                    <a href="penarikan_admin.html">Penarikan</a>
+                @endif
                 <button type="button" data-profile-logout data-logout-target="auth.html">
                     Keluar
                 </button>
@@ -51,10 +62,24 @@
         <div class="page-intro ranking-intro">
             <div>
                 <h1>Peringkat bulan ini</h1>
-                <p>Batam Centre</p>
+                <p>{{ $isUserView ? auth()->user()->district : 'Batam Centre' }}</p>
                 <p class="ranking-period-note">Setoran menunggu verifikasi dihitung sementara.</p>
             </div>
         </div>
+
+        @if ($isUserView)
+            <section class="ranking-self-summary" aria-label="Posisi Anda bulan ini">
+                <div>
+                    <p class="eyebrow eyebrow-green">Peringkat Anda</p>
+                    <strong>{{ $currentUser['rank'] ? '#' . $currentUser['rank'] : ($currentUser['hasContribution'] ? 'Di luar 100 besar' : 'Belum setor') }}</strong>
+                </div>
+                <p>Kontribusi bulan ini: <strong>{{ $currentUser['weight_label'] }} kg</strong>
+                    @if ($currentUser['hasPending'])
+                        <span>· termasuk setoran menunggu verifikasi</span>
+                    @endif
+                </p>
+            </section>
+        @endif
 
         <section class="ranking-overview" aria-label="Peringkat kontribusi bulan ini">
             <article class="ranking-board" aria-label="Papan peringkat kontributor">
@@ -85,11 +110,12 @@
                         aria-label="Daftar hingga 100 peringkat kontributor">
                         <ol class="ranking-list">
                             @forelse ($rankings as $entry)
-                                <li class="{{ $entry['rank'] <= 3 ? 'top-rank-row' : 'rank-row' }}">
+                                <li
+                                    class="{{ $entry['rank'] <= 3 ? 'top-rank-row' : 'rank-row' }}{{ $isUserView && $entry['id'] === auth()->id() ? ' current-user-rank' : '' }}">
                                     <span class="list-rank">#{{ $entry['rank'] }}</span>
                                     <span class="list-avatar">{{ $entry['initials'] }}</span>
                                     <span class="list-name">
-                                        <strong>{{ $entry['name'] }}</strong>
+                                        <strong>{{ $entry['name'] }}{{ $isUserView && $entry['id'] === auth()->id() ? ' (Anda)' : '' }}</strong>
                                         @if ($entry['has_pending'])
                                             <small class="ranking-pending-note">{{ $entry['pending_weight_label'] }} kg
                                                 menunggu verifikasi</small>
@@ -109,8 +135,10 @@
                 <div class="waste-ranking-copy">
                     <h2 id="waste-ranking-title">Jenis sampah<br />bulan ini</h2>
                     <p>Termasuk setoran yang masih menunggu verifikasi.</p>
-                    <a class="button button-light" href="{{ route('admin.prices') }}">Lihat semua <span
-                            aria-hidden="true">→</span></a>
+                    <a class="button button-light"
+                        href="{{ $isUserView ? 'setor_sampah.html#prices-title' : route('admin.prices') }}">
+                        {{ $isUserView ? 'Lihat harga' : 'Lihat semua' }} <span aria-hidden="true">→</span>
+                    </a>
                 </div>
                 <ol class="waste-ranking-list" aria-label="Berat berdasarkan jenis sampah">
                     @forelse ($wasteRankings as $waste)
